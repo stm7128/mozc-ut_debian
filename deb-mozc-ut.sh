@@ -58,7 +58,8 @@ else
 	del_tmpdir
 	exit 0
 fi
-read -p "if it's for build only, please enter 1. If you also want to install, please enter 2: " build
+echo -n -e "Build Only:1\nBuild&install:2"
+read -p "please type number: " build
 # build dic
 echo "build mozc-ut dic" 
 git clone https://github.com/utuhiro78/merge-ut-dictionaries.git utdic
