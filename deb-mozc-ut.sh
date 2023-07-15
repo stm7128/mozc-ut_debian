@@ -17,12 +17,12 @@ if [ -z "$(grep -v "#deb-src" /etc/apt/sources.list|grep -v "#"|grep deb-src)" ]
 fi
 
 # check dep
-
+installdep=""
 if [ "$(which apt-src)" = "/usr/bin/apt-src" ]; then
 	echo "apt-src found"
 else
 	echo "apt-src not found.\ninstalling."
-	installdep="apt-src "
+	installdep+="apt-src "
 fi
 
 
@@ -30,7 +30,7 @@ if [ "$(which git)" = "/usr/bin/git" ]; then
 	echo "git found"
 else
 	echo -e "git not found. \ninstalling."
-	installdep=$installdep"git "
+	installdep+="git "
 fi
 
 
@@ -38,7 +38,7 @@ if [ "$(which ruby)" = "/usr/bin/ruby" ]; then
 	echo "ruby found"
 else
 	echo -e "ruby not found. \ninstalling."
-	installdep=$installdep"ruby "
+	installdep+="ruby "
 fi
 
 # instal dep
