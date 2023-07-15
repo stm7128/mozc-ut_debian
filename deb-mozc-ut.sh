@@ -58,7 +58,7 @@ else
 	del_tmpdir
 	exit 0
 fi
-echo -n -e "Build Only:1\nBuild&install:2"
+echo -e "Build Only:1\nBuild&install:2"
 read -p "please type number: " build
 # build dic
 echo "build mozc-ut dic" 
