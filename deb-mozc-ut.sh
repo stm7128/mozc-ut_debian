@@ -70,7 +70,7 @@ chmod +x ./make.sh
 echo "download mozc source"
 cd $dirname
 sudo apt-src update
-sudo apt-src install mozc
+apt-src install mozc
 mozcsrcdir=$dirname"/"$(ls -d *mozc*/|sed -e s@/@@)"/"
 
 
