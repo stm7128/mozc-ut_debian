@@ -52,7 +52,6 @@ fi
 echo -e "input method\n・ibus\n・fcitx\n・fcitx5\n・uim\n・emacs"
 read -p "select input method: " inpmethod
 read -p "The input method you have chosen is "$inpmethod". Please type "y" if you prefer: " oyn
-exit 
 if [ "$oyn" = y ]; then
 	:
 else
