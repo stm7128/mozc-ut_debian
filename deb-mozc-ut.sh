@@ -93,7 +93,7 @@ else
     		sudo apt remove fcitx -y -qq
       	fi
 fi
-if [ "$build" = 2 ]; then
+if [ "$build" = "2" ]; then
 	rm -f *dbgsym*
 	sudo dpkg -i ./$inpmethod"-mozc"*.deb
 	sudo dpkg -i ./mozc-server*.deb
@@ -101,5 +101,9 @@ if [ "$build" = 2 ]; then
 	sudo dpkg -i ./mozc-utils-gui*.deb
 fi
 # clean
-rm -rf $dirname
+if [ "$build" = "2" ]; then
+	rm -rf $dirname
+else
+	echo "build deb dir is"$dirname
+fi
 echo "done."
