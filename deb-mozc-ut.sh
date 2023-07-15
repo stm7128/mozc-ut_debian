@@ -86,7 +86,13 @@ apt-src build $inpmethod"-mozc"
 echo "install mozc"
 if [ "$inpmethod" = "fcitx5" ]; then
 	sudo apt install fcitx5 -y -qq
- fi
+else
+	if [ "$inpmethod" = "fcitx" ]; then
+ 		:
+   	else
+    		sudo apt remove fcitx -y -qq
+      	fi
+fi
 if [ "$build" = 2 ]; then
 	rm -f *dbgsym*
 	sudo dpkg -i ./$inpmethod"-mozc"*.deb
