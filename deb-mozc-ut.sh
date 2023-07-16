@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-# gen random dirname and makedir
-dirname="/tmp/mozc-ut-"$(dd if=/dev/random bs=1 count=5 2> /dev/null| base64 | head -c 5)
+# ランダムなディレクトリ名を生成してディレクトリを作成
+dirname="/tmp/mozc-ut-"$(dd if=/dev/random bs=1 count=5 2> /dev/null | base64 | head -c 5)
 mkdir $dirname
 cd $dirname
 pwd
@@ -10,65 +10,62 @@ del_tmpdir() {
 	sudo rm -rf $dirname
 }
 
-if [ -z "$(grep -v "#deb-src" /etc/apt/sources.list|grep -v "#"|grep deb-src)" ]; then
-	echo "deb-src repo is not enabled."
+if [ -z "$(grep -v "#deb-src" /etc/apt/sources.list | grep -v "#" | grep deb-src)" ]; then
+	echo "deb-src リポジトリが有効になっていません。"
 	del_tmpdir
 	exit 1
 fi
 
-# check dep
+# 依存関係をチェック
 installdep=""
 if [ "$(which apt-src)" = "/usr/bin/apt-src" ]; then
-	echo "apt-src found"
+	echo "apt-src が見つかりました。"
 else
-	echo "apt-src not found.\ninstalling."
+	echo "apt-src が見つかりません。\nインストールします。"
 	installdep+="apt-src "
 fi
 
-
 if [ "$(which git)" = "/usr/bin/git" ]; then
-	echo "git found"
+	echo "git が見つかりました。"
 else
-	echo -e "git not found. \ninstalling."
+	echo -e "git が見つかりません。\nインストールします。"
 	installdep+="git "
 fi
 
-
 if [ "$(which ruby)" = "/usr/bin/ruby" ]; then
-	echo "ruby found"
+	echo "ruby が見つかりました。"
 else
-	echo -e "ruby not found. \ninstalling."
+	echo -e "ruby が見つかりません。\nインストールします。"
 	installdep+="ruby"
 fi
 
-# instal dep
-#
+# 依存関係をインストール
 if [ "$installdep" ]; then
-	echo "install dep."
+	echo "依存関係をインストール中。"
 	sudo apt install $installdep -y -qq
 fi
 
-# Determining the input method
-echo -e "input method\n・ibus\n・fcitx\n・fcitx5\n・uim\n・emacs"
-read -p "select input method: " inpmethod
-read -p "The input method you have chosen is "$inpmethod". Please type "y" if you prefer: " oyn
+# 入力方式の選択
+echo -e "入力方式\n・ibus\n・fcitx\n・fcitx5\n・uim\n・emacs"
+read -p "インプットメソッドを選択してください: " inpmethod
+read -p "選択したインプットメソッドは "$inpmethod" です。続ける場合は「y」を入力してください: " oyn
 if [ "$oyn" = y ]; then
 	:
 else
 	del_tmpdir
 	exit 0
 fi
-echo -e "Build Only:1\nBuild&install:2"
-read -p "please type number: " build
-# build dic
-echo "build mozc-ut dic" 
+echo -e "ビルドのみ: 1\nビルドとインストール: 2"
+read -p "番号を入力してください: " build
+# 辞書のビルド
+echo "mozc-ut 辞書をビルドしています" 
 git clone https://github.com/utuhiro78/merge-ut-dictionaries.git utdic
 cd utdic/src
 chmod +x ./make.sh
 ./make.sh
 
-# download mozc source
-echo "download mozc source"
+# Mozc ソースのダウンロード
+echo "Mozc ソースをダウンロードしています"
 cd $dirname
 sudo apt-src update
 apt-src install mozc
@@ -77,22 +74,23 @@ mozcsrcdir=$dirname"/"$(ls -d *mozc*/|sed -e s@/@@)"/"
 mozc_version=$(echo $mozcsrcdir | sed -E 's/.*-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+).*/\1/')
 
 
-if [ $(cat ~/.mozc_ut_install) = "$mozc_version" ]
-	echo "UT dic patched mozc is already installed."
+if [ $(cat ~/.mozc_ut_install) = "$mozc_version" ]; then
+	echo "UT 辞書パッチ済みの Mozc はすでにインストールされています。"
  	exit
+else
+	sudo apt-mark unhold $inpmethod"-mozc"
+ 	sudo apt-mark unhold mozc-server
 fi
 
-# patch mozc dic
-
-
+# Mozc 辞書へのパッチ適用
 cat $dirname"/utdic/src/mozcdic-ut.txt" >> $mozcsrcdir"src/data/dictionary_oss/dictionary00.txt"
 
-# build mozc
-echo "build mozc"
+# Mozc のビルド
+echo "Mozc をビルドしています"
 apt-src build $inpmethod"-mozc"
 
-# install mozc
-echo "install mozc"
+# Mozc のインストール
+echo "Mozc をインストールしています"
 if [ "$inpmethod" = "fcitx5" ]; then
 	sudo apt install fcitx5 -y -qq
 else
@@ -111,10 +109,10 @@ if [ "$build" = "2" ]; then
  	sudo apt-mark hold mozc-server
   	echo $mozc_version > ~/.mozc_ut_install 
 fi
-# clean
+# クリーンアップ
 if [ "$build" = "2" ]; then
 	rm -rf $dirname
 else
-	echo "build deb dir is"$dirname
+	echo "ビルドしたディレクトリ: $dirname"
 fi
-echo "done."
+echo "完了"
