@@ -35,6 +35,17 @@ if [ ${#missing_dependencies[@]} -gt 0 ]; then
   sudo apt install "${missing_dependencies[@]}" -y -qq
 fi
 
+
+
+# 入力方式の選択
+input_methods=("ibus" "fcitx" "fcitx5" "uim" "emacs")
+echo -e "入力方式: ${input_methods[*]}"
+read -p "インプットメソッドを選択してください: " inpmethod
+if [[ ! " ${input_methods[*]} " =~ " ${inpmethod} " ]]; then
+  echo "無効な入力方式が選択されました。"
+  exit 1
+fi
+
 mozc_version=$(echo $mozcsrcdir | sed -E 's/.*-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+).*/\1/')
 
 
@@ -44,15 +55,6 @@ if [ $(cat ~/.mozc_ut_install) = "$mozc_version" ]; then
 else
 	sudo apt-mark unhold $inpmethod"-mozc"
  	sudo apt-mark unhold mozc-server
-fi
-
-# 入力方式の選択
-input_methods=("ibus" "fcitx" "fcitx5" "uim" "emacs")
-echo -e "入力方式: ${input_methods[*]}"
-read -p "インプットメソッドを選択してください: " inpmethod
-if [[ ! " ${input_methods[*]} " =~ " ${inpmethod} " ]]; then
-  echo "無効な入力方式が選択されました。"
-  exit 1
 fi
 
 read -p "$inpmethod が選択されました。よろしいですか？ [y/N]: " oyn
