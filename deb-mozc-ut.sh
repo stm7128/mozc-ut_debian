@@ -2,7 +2,7 @@
 set -e
 
 # ランダムなディレクトリ名を生成してディレクトリを作成
-dirname="/tmp/mozc-ut-"$(dd if=/dev/random bs=1 count=5 2> /dev/null | tr -dc A-Za-z0-9 | head -c 5)
+dirname="/tmp/mozc-ut-"$(dd if=/dev/random bs=1 count=5 2> /dev/null | base64 | head -c 5)
 mkdir $dirname
 cd $dirname
 pwd
