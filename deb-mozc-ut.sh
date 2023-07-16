@@ -35,6 +35,17 @@ if [ ${#missing_dependencies[@]} -gt 0 ]; then
   sudo apt install "${missing_dependencies[@]}" -y -qq
 fi
 
+mozc_version=$(echo $mozcsrcdir | sed -E 's/.*-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+
+
+if [ $(cat ~/.mozc_ut_install) = "$mozc_version" ]; then
+	echo "UT 辞書パッチ済みの Mozc はすでにインストールされています。"
+ 	exit
+else
+	sudo apt-mark unhold $inpmethod"-mozc"
+ 	sudo apt-mark unhold mozc-server
+fi
+
 # 入力方式の選択
 input_methods=("ibus" "fcitx" "fcitx5" "uim" "emacs")
 echo -e "入力方式: ${input_methods[*]}"
@@ -68,16 +79,7 @@ sudo apt-src update
 apt-src install mozc
 mozcsrcdir=$dirname"/"$(ls -d *mozc*/|sed -e s@/@@)"/"
 
-mozc_version=$(echo $mozcsrcdir | sed -E 's/.*-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+).*/\1/')
 
-
-if [ $(cat ~/.mozc_ut_install) = "$mozc_version" ]; then
-	echo "UT 辞書パッチ済みの Mozc はすでにインストールされています。"
- 	exit
-else
-	sudo apt-mark unhold $inpmethod"-mozc"
- 	sudo apt-mark unhold mozc-server
-fi
 
 # Mozc 辞書へのパッチ適用
 cat $dirname"/utdic/src/mozcdic-ut.txt" >> $mozcsrcdir"src/data/dictionary_oss/dictionary00.txt"
