@@ -47,7 +47,7 @@ fi
 if [ "$oyn" = y ]; then
 	:
 else
-	del_tmpdir
+	cleanup
 	exit 0
 fi
 echo -e "ビルドのみ: 1\nビルドとインストール: 2"
@@ -92,8 +92,8 @@ else
 	if [ "$inpmethod" = "fcitx" ]; then
  		:
    	else
-    		sudo apt remove *fcitx* -y -qq
-      		sudo apt install $inpmethod -y -qq
+		sudo apt remove *fcitx* -y -qq
+		sudo apt install $inpmethod -y -qq
       	fi
 fi
 if [ "$build" = "2" ]; then
