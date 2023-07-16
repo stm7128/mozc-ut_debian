@@ -2,53 +2,48 @@
 set -e
 
 # ランダムなディレクトリ名を生成してディレクトリを作成
-dirname="/tmp/mozc-ut-"$(dd if=/dev/random bs=1 count=5 2> /dev/null | base64 | head -c 5)
+dirname="/tmp/mozc-ut-"$(dd if=/dev/random bs=1 count=5 2> /dev/null | tr -dc A-Za-z0-9 | head -c 5)
 mkdir $dirname
 cd $dirname
 pwd
-del_tmpdir() {
-	sudo rm -rf $dirname
+cleanup() {
+  echo "クリーンアップ中..."
+  sudo rm -rf "$dirname"
 }
+
+# シグナルのハンドリング
+trap cleanup EXIT INT TERM
 
 if [ -z "$(grep -v "#deb-src" /etc/apt/sources.list | grep -v "#" | grep deb-src)" ]; then
 	echo "deb-src リポジトリが有効になっていません。"
-	del_tmpdir
+	cleanup
 	exit 1
 fi
 
 # 依存関係をチェック
-installdep=""
-if [ "$(which apt-src)" = "/usr/bin/apt-src" ]; then
-	echo "apt-src が見つかりました。"
-else
-	echo "apt-src が見つかりません。\nインストールします。"
-	installdep+="apt-src "
-fi
+dependencies=("apt-src" "git" "ruby")
+missing_dependencies=()
+for dependency in "${dependencies[@]}"; do
+  if ! command -v "$dependency" >/dev/null; then
+    missing_dependencies+=("$dependency")
+  fi
+done
 
-if [ "$(which git)" = "/usr/bin/git" ]; then
-	echo "git が見つかりました。"
-else
-	echo -e "git が見つかりません。\nインストールします。"
-	installdep+="git "
-fi
-
-if [ "$(which ruby)" = "/usr/bin/ruby" ]; then
-	echo "ruby が見つかりました。"
-else
-	echo -e "ruby が見つかりません。\nインストールします。"
-	installdep+="ruby"
-fi
-
-# 依存関係をインストール
-if [ "$installdep" ]; then
-	echo "依存関係をインストール中。"
-	sudo apt install $installdep -y -qq
+if [ ${#missing_dependencies[@]} -gt 0 ]; then
+  echo "以下の依存関係が見つかりませんでした: ${missing_dependencies[*]}"
+  echo "依存関係をインストールします..."
+  sudo apt install "${missing_dependencies[@]}" -y -qq
 fi
 
 # 入力方式の選択
-echo -e "入力方式\n・ibus\n・fcitx\n・fcitx5\n・uim\n・emacs"
+input_methods=("ibus" "fcitx" "fcitx5" "uim" "emacs")
+echo -e "入力方式: ${input_methods[*]}"
 read -p "インプットメソッドを選択してください: " inpmethod
-read -p "選択したインプットメソッドは "$inpmethod" です。続ける場合は「y」を入力してください: " oyn
+if [[ ! " ${input_methods[*]} " =~ " ${inpmethod} " ]]; then
+  echo "無効な入力方式が選択されました。"
+  exit 1
+fi
+
 if [ "$oyn" = y ]; then
 	:
 else
@@ -64,9 +59,14 @@ cd utdic/src
 chmod +x ./make.sh
 ./make.sh
 
-# なんかいろいろ
+# Mozc ソースのダウンロード
+echo "Mozc ソースをダウンロードしています"
+cd $dirname
+sudo apt-src update
+apt-src install mozc
+mozcsrcdir=$dirname"/"$(ls -d *mozc*/|sed -e s@/@@)"/"
 
-mozc_version=$(apt search mozc-server 2> /dev/null|grep mozc-server|sed -E 's/.* ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\+.*/\1/')
+mozc_version=$(echo $mozcsrcdir | sed -E 's/.*-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+).*/\1/')
 
 
 if [ $(cat ~/.mozc_ut_install) = "$mozc_version" ]; then
@@ -76,15 +76,6 @@ else
 	sudo apt-mark unhold $inpmethod"-mozc"
  	sudo apt-mark unhold mozc-server
 fi
-
-
-# Mozc ソースのダウンロード
-echo "Mozc ソースをダウンロードしています"
-cd $dirname
-sudo apt-src update
-apt-src install mozc
-mozcsrcdir=$dirname"/"$(ls -d *mozc*/|sed -e s@/@@)"/"
-
 
 # Mozc 辞書へのパッチ適用
 cat $dirname"/utdic/src/mozcdic-ut.txt" >> $mozcsrcdir"src/data/dictionary_oss/dictionary00.txt"
