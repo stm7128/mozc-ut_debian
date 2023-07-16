@@ -2,7 +2,7 @@
 set -e
 
 # gen random dirname and makedir
-dirname="/tmp/mozc-ut-"$(dd if=/dev/urandom bs=1 count=5 2> /dev/null| base64 | head -c 5)
+dirname="/tmp/mozc-ut-"$(dd if=/dev/random bs=1 count=5 2> /dev/null| base64 | head -c 5)
 mkdir $dirname
 cd $dirname
 pwd
@@ -38,7 +38,7 @@ if [ "$(which ruby)" = "/usr/bin/ruby" ]; then
 	echo "ruby found"
 else
 	echo -e "ruby not found. \ninstalling."
-	installdep+="ruby "
+	installdep+="ruby"
 fi
 
 # instal dep
@@ -74,8 +74,16 @@ sudo apt-src update
 apt-src install mozc
 mozcsrcdir=$dirname"/"$(ls -d *mozc*/|sed -e s@/@@)"/"
 
+mozc_version=$(echo $mozcsrcdir | sed -E 's/.*-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+
+
+if [ $(cat ~/.mozc_ut_install) = "$mozc_version" ]
+	echo "UT dic patched mozc is already installed."
+ 	exit
+fi
 
 # patch mozc dic
+
 
 cat $dirname"/utdic/src/mozcdic-ut.txt" >> $mozcsrcdir"src/data/dictionary_oss/dictionary00.txt"
 
@@ -91,13 +99,17 @@ else
 	if [ "$inpmethod" = "fcitx" ]; then
  		:
    	else
-    		sudo apt remove fcitx -y -qq
+    		sudo apt remove *fcitx* -y -qq
+      		sudo apt install $inpmethod -y -qq
       	fi
 fi
 if [ "$build" = "2" ]; then
 	rm -f *dbgsym*
 	sudo dpkg -i ./$inpmethod"-mozc"*.deb
 	sudo dpkg -i ./mozc-server*.deb
+	sudo apt-mark hold $inpmethod"-mozc"
+ 	sudo apt-mark hold mozc-server
+  	echo $mozc_version > ~/.mozc_ut_install 
 fi
 # clean
 if [ "$build" = "2" ]; then
