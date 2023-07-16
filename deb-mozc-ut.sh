@@ -44,6 +44,8 @@ if [[ ! " ${input_methods[*]} " =~ " ${inpmethod} " ]]; then
   exit 1
 fi
 
+read -p "$input_methods が選択されました。よろしいですか？ [y/N]: " oyn
+
 if [ "$oyn" = y ]; then
 	:
 else
