@@ -98,8 +98,6 @@ if [ "$build" = "2" ]; then
 	rm -f *dbgsym*
 	sudo dpkg -i ./$inpmethod"-mozc"*.deb
 	sudo dpkg -i ./mozc-server*.deb
-	sudo dpkg -i ./mozc-data*.deb
-	sudo dpkg -i ./mozc-utils-gui*.deb
 fi
 # clean
 if [ "$build" = "2" ]; then
