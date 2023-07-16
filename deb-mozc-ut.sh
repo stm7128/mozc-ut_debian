@@ -64,14 +64,9 @@ cd utdic/src
 chmod +x ./make.sh
 ./make.sh
 
-# Mozc ソースのダウンロード
-echo "Mozc ソースをダウンロードしています"
-cd $dirname
-sudo apt-src update
-apt-src install mozc
-mozcsrcdir=$dirname"/"$(ls -d *mozc*/|sed -e s@/@@)"/"
+# なんかいろいろ
 
-mozc_version=$(echo $mozcsrcdir | sed -E 's/.*-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+mozc_version=$(apt search mozc-server 2> /dev/null|grep mozc-server|sed -E 's/.* ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\+.*/\1/')
 
 
 if [ $(cat ~/.mozc_ut_install) = "$mozc_version" ]; then
@@ -81,6 +76,15 @@ else
 	sudo apt-mark unhold $inpmethod"-mozc"
  	sudo apt-mark unhold mozc-server
 fi
+
+
+# Mozc ソースのダウンロード
+echo "Mozc ソースをダウンロードしています"
+cd $dirname
+sudo apt-src update
+apt-src install mozc
+mozcsrcdir=$dirname"/"$(ls -d *mozc*/|sed -e s@/@@)"/"
+
 
 # Mozc 辞書へのパッチ適用
 cat $dirname"/utdic/src/mozcdic-ut.txt" >> $mozcsrcdir"src/data/dictionary_oss/dictionary00.txt"
