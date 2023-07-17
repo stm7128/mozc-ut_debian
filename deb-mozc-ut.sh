@@ -93,6 +93,7 @@ apt-src build $inpmethod"-mozc"
 # Mozc のインストール
 echo "Mozc をインストールしています"
 if [ "$inpmethod" = "fcitx5" ]; then
+	sudo apt remove gir1.2-fcitx-1.0 libfcitx-config4 libfcitx-core0 libfcitx-gclient1 libfcitx-utils0 -y -qq
 	sudo apt install fcitx5 -y -qq
 else
 	if [ "$inpmethod" = "fcitx" ]; then
