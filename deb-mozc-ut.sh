@@ -105,7 +105,7 @@ else
 fi
 if [ "$build" = "2" ]; then
 	rm -f *dbgsym*
-	sudo dpkg -i ./$inpmethod"-mozc"*.deb
+	sudo apt install ./$inpmethod"-mozc"*.deb
 	sudo dpkg -i ./mozc-server*.deb
 	sudo apt-mark hold $inpmethod"-mozc"
  	sudo apt-mark hold mozc-server
