@@ -49,7 +49,7 @@ fi
 mozc_version=$(apt search mozc-server 2> /dev/null|grep mozc-server|sed -E 's/.* ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\+.*/\1/')
 
 
-if [ $(cat ~/.mozc_ut_install) = "$mozc_version" ]; then
+if [ $(cat ~/.mozc_ut_install 2> /dev/null) = "$mozc_version" ]; then
 	echo "UT 辞書パッチ済みの Mozc は既にインストールされています。"
  	exit
 else
