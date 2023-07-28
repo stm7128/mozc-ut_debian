@@ -32,7 +32,7 @@ done
 if [ ${#missing_dependencies[@]} -gt 0 ]; then
   echo "以下の依存関係が見つかりませんでした: ${missing_dependencies[*]}"
   echo "依存関係をインストールします..."
-  sudo apt install "${missing_dependencies[@]}" -y -qq
+  sudo apt install "${missing_dependencies[@]}" -y  > /dev/null 2>&1
 fi
 
 
@@ -68,14 +68,14 @@ fi
 echo -e "ビルドのみ: 1\nビルドとインストール: 2"
 read -p "番号を入力してください: " build
 # 辞書のビルド
-echo "mozc-ut 辞書をビルドしています" 
-git clone https://github.com/utuhiro78/merge-ut-dictionaries.git utdic
+echo "mozc-ut 辞書をビルドしています..." 
+git clone https://github.com/utuhiro78/merge-ut-dictionaries.git utdic > /dev/null 2>&1
 cd utdic/src
 chmod +x ./make.sh
-./make.sh
+./make.sh > /dev/null 2>&1
 
 # Mozc ソースのダウンロード
-echo "Mozc ソースをダウンロードしています"
+echo "Mozc ソースをダウンロードしています..."
 cd $dirname
 sudo apt-src update
 apt-src install mozc
@@ -93,14 +93,14 @@ apt-src build $inpmethod"-mozc"
 # Mozc のインストール
 echo "Mozc をインストールしています"
 if [ "$inpmethod" = "fcitx5" ]; then
-	sudo apt remove gir1.2-fcitx-1.0 libfcitx-config4 libfcitx-core0 libfcitx-gclient1 libfcitx-utils0 -y -qq
-	sudo apt install fcitx5 -y -qq
+	sudo apt remove gir1.2-fcitx-1.0 libfcitx-config4 libfcitx-core0 libfcitx-gclient1 libfcitx-utils0 -y > /dev/null 2>&1
+	sudo apt install fcitx5 -y -qq > /dev/null 2>&1
 else
 	if [ "$inpmethod" = "fcitx" ]; then
  		:
    	else
-		sudo apt remove *fcitx* -y -qq
-		sudo apt install $inpmethod -y -qq
+		sudo apt remove gir1.2-fcitx-1.0 libfcitx-config4 libfcitx-core0 libfcitx-gclient1 libfcitx-utils0 -y  > /dev/null 2>&1
+		sudo apt install $inpmethod -y > /dev/null 2>&1
       	fi
 fi
 if [ "$build" = "2" ]; then
