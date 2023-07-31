@@ -32,7 +32,7 @@ done
 if [ ${#missing_dependencies[@]} -gt 0 ]; then
   echo "以下の依存関係が見つかりませんでした: ${missing_dependencies[*]}"
   echo "依存関係をインストールします..."
-  sudo apt install "${missing_dependencies[@]}" -y  > /dev/null 2>&1
+  sudo apt install "${missing_dependencies[@]}"
 fi
 
 
@@ -46,7 +46,7 @@ if [[ ! " ${input_methods[*]} " =~ " ${inpmethod} " ]]; then
   exit 1
 fi
 
-mozc_version=$(apt search mozc-server 2> /dev/null|grep mozc-server|sed -E 's/.* ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\+.*/\1/')
+mozc_version=$(apt show mozc-server 2>/dev/null | grep -E '^Version:' | awk '{print $2}')
 
 
 if [ $(cat ~/.mozc_ut_install 2> /dev/null) = "$mozc_version" ]; then
@@ -72,7 +72,7 @@ echo "mozc-ut 辞書をビルドしています..."
 git clone https://github.com/utuhiro78/merge-ut-dictionaries.git utdic > /dev/null 2>&1
 cd utdic/src
 chmod +x ./make.sh
-./make.sh > /dev/null 2>&1
+./make.sh
 
 # Mozc ソースのダウンロード
 echo "Mozc ソースをダウンロードしています..."
