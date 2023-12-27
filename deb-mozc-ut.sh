@@ -43,7 +43,6 @@ if [ $(cat ~/.mozc_ut_install 2> /dev/null) = "$mozc_version" ]; then
 	echo "UT 辞書パッチ済みの Mozc は既にインストールされています。"
  	exit
 else
-	sudo apt-mark unhold $inpmethod"-mozc"
  	sudo apt-mark unhold mozc-server
 fi
 
