@@ -69,7 +69,7 @@ cat $dirname"/utdic/src/mozcdic-ut.txt" >> $mozcsrcdir"src/data/dictionary_oss/d
 
 # Mozc のビルド
 echo "Mozc をビルドしています"
-apt-src build "$inpmethod-mozc"
+apt-src build mozc
 
 # Mozc のインストール
 echo "Mozc をインストールしています"
